@@ -4,11 +4,18 @@
   <img src ="https://evrythng.com/wp-content/uploads/Search_results_-_Google_Drive-768x363.png" />
 </p>
 
-This project provides a number of tools for the [GS1 Digital Link standard](https://evrythng.com/upgrading-the-barcode-to-the-web-gs1-digital-link/), the standard that upgrades the barcode to the Web! The tools offer an ideal playground to experiment with Digital Links with a JavaScript generator and a verifier.
+This project provides a number of tools for the 
+[GS1 Digital Link standard](https://evrythng.com/upgrading-the-barcode-to-the-web-gs1-digital-link/),
+the standard that upgrades the barcode to the Web! The tools offer an ideal 
+playground to experiment with Digital Links with a JavaScript generator and a 
+verifier.
 
 The tool is also directly available on: https://digital-link.evrythng.com/
 
-If you would like to use Digital Links for your brand in production and at scale do not hesistate to [contact us](https://evrythng.com/gs1/), the EVRYTHNG platform is the first commercial platform to support the Digital Link.
+If you would like to use Digital Links for your brand in production and at scale
+do not hesistate to [contact us](https://evrythng.com/gs1/), the EVRYTHNG 
+Platform is the first commercial platform to support the Digital Link.
+
 
 ## Digital Link Generator
 
@@ -36,14 +43,16 @@ straight to the verifier tool (see below), or copy/scan the equivalent QR code.
 
 ![verifier](src/assets/verifier.png)
 
-The verifier tool uses the [`apglib`](https://github.com/ldthomas/apg-js2-lib) 
+The verifier tool uses the 
+[`digital-link.js`]((https://github.com/evrythng/digital-link.js)
 library to check a submitted GS1 Digital Link for formatting errors using the 
 grammar as detailed in `src/scripts/grammar.js`. This grammar can also be viewed 
 from the verifier page under the 'Grammar' tab. 
 
 After the verifier has run on the submitted GS1 Digital Link, the results of 
 the validation are visible on the right hand side, including statistics and 
-validation trace entries from the `apglib` library itself.
+validation trace entries from the 
+[`apglib`](https://github.com/ldthomas/apg-js2-lib) library itself.
 
 
 ## Development

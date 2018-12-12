@@ -1,11 +1,7 @@
 /* eslint new-cap: 0 */
 
-const apglib = require('apg-lib');
-
-const { grammarObject } = require('./grammar');
 const { getElement } = require('./util');
-
-const GRAMMAR = new grammarObject();
+const { DigitalLink, Utils } = require('digital-link.js');
 
 const UI = {
   divResults: getElement('div_results'),
@@ -15,48 +11,25 @@ const UI = {
   spanVerdictResult: getElement('span_verdict_result'),
 };
 
-const createParser = () => {
-  const parser = new apglib.parser();
-  parser.stats = new apglib.stats();
-  parser.trace = new apglib.trace();
-
-  return parser;
+// Validate an arbitrary rule
+const validate = (inputStr, startRule) => {
+  return Utils.testRule(startRule, inputStr);
 };
 
-const validate = (inputString, startRule) => {
-  const parser = createParser();
-  const inputChars = apglib.utils.stringToChars(inputString);
-  const result = parser.parse(GRAMMAR, startRule, inputChars, []);
-  return result.success;
-};
-
-const generateReport = (inputString, startRule) => {
+const generateReport = (inputStr, startRule) => {
   try {
-    const parser = createParser();
-    const inputChars = apglib.utils.stringToChars(inputString);
-    const result = parser.parse(GRAMMAR, startRule, inputChars, []);
-
-    // Parsing stats...
-    let statsHtml = parser.stats.toHtml('ops', 'ops-only stats');
-    statsHtml += parser.stats.toHtml('index', 'rules ordered by index');
-    statsHtml += parser.stats.toHtml('alpha', 'rules ordered alphabetically');
-    statsHtml += parser.stats.toHtml('hits', 'rules ordered by hit count');
-    UI.divStats.innerHTML = statsHtml;
-
-    // Full trace of the parsing...
-    const traceHtml = parser.trace.toHtmlPage('ascii', 'Parsing details:')
+    UI.divStats.innerHTML = Utils.generateStatsHtml(inputStr);
+    UI.divResults.innerHTML = Utils.generateResultsHtml(inputStr);
+    UI.divTrace.innerHTML = Utils.generateTraceHtml(inputStr)
       .replace('display mode: ASCII', '');
-    UI.divTrace.innerHTML = traceHtml;
 
-    UI.spanVerdictResult.innerHTML = `<strong>${result.success ? 'VALID' : 'INVALID'}</strong>`;
-    UI.imgVerdict.src = `./assets/${result.success ? '' : 'in'}valid.svg`;
-    UI.divResults.innerHTML = apglib.utils.parserResultToHtml(result);
+    const isValid = DigitalLink(inputStr).isValid();
+    UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
+    UI.imgVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
 
-    return parser.success;
   } catch (e) {
     console.log(e);
     UI.divResults.innerHTML = `EXCEPTION THROWN: ${e.message || e}`;
-    return false;
   }
 };
 
