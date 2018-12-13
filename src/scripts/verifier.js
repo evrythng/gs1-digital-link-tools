@@ -1,5 +1,5 @@
+const { DigitalLink, Utils } = require('digital-link.js');
 const { grammarObject } = require('./grammar');
-const parser = require('./parser');
 const { getElement } = require('./util');
 
 const DEFAULT_QUERY = 'https://gs1.example.org/gtin/9780345418913';
@@ -7,30 +7,42 @@ const DEFAULT_QUERY = 'https://gs1.example.org/gtin/9780345418913';
 const UI = {
   aVerify: getElement('a_verify'),
   divGrammar: getElement('div_grammar'),
+  divResults: getElement('div_results'),
+  divStats: getElement('div_stats'),
+  divTrace: getElement('div_trace'),
+  imgVerdict: getElement('img_verdict'),
   inputVerifierQuery: getElement('input_verifier_query'),
+  spanVerdictResult: getElement('span_verdict_result'),
 };
 
 const getUrlParam = () => {
   const { search } = document.location;
-  if (!search.includes('?url')) return false;
-
-  return search.substring(search.indexOf('url=') + 'url='.length);
+  return search.includes('url') 
+    ? search.substring(search.indexOf('url=') + 'url='.length)
+    : false;
 };
 
-const setupUI = () => {
+const onVerifyClicked = () => {
+  try {
+    const inputStr = UI.inputVerifierQuery.value;
+    UI.divStats.innerHTML = Utils.generateStatsHtml(inputStr);
+    UI.divResults.innerHTML = Utils.generateResultsHtml(inputStr);
+    UI.divTrace.innerHTML = Utils.generateTraceHtml(inputStr)
+      .replace('display mode: ASCII', '');
+
+    const isValid = DigitalLink(inputStr).isValid();
+    UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
+    UI.imgVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
+  } catch (e) {
+    console.log(e);
+    UI.divResults.innerHTML = `Error: ${e.message || e}`;
+  }
+};
+
+const main = () => {
   UI.inputVerifierQuery.value = getUrlParam() || DEFAULT_QUERY;
-
-  UI.aVerify.onclick = () => {
-    const inputString = UI.inputVerifierQuery.value;
-    const startRule = inputString.includes('id.gs1.org') ? 'canonicalGS1webURI' : 'customGS1webURI';
-    parser.generateReport(inputString, startRule);
-  };
-
+  UI.aVerify.onclick = onVerifyClicked;
   UI.divGrammar.innerHTML = new grammarObject().toString();
 };
 
-(() => {
-  setupUI();
-
-  console.log('Script loaded!');
-})();
+main();

@@ -1,11 +1,6 @@
 const Qrious = require('qrious');
-
-const parser = require('./parser');
-const {
-  getElement,
-  setVisible,
-  setRowVisible,
-} = require('./util');
+const { DigitalLink, Utils } = require('digital-link.js');
+const { getElement, setVisible, setRowVisible } = require('./util');
 
 const AI_LIST = require('../data/ai-list.json');
 const ALPHA_MAP = require('../data/alpha-map.json');
@@ -27,29 +22,29 @@ const UI = {
   checkFormatNumeric: getElement('check_format_numeric'),
   checkGS1Attributes: getElement('check_gs1_data_attributes'),
   checkQualifiers: getElement('check_key_qualifiers'),
-  divDomainWrapper: getElement('div_domain_wrapper'),
   divCustomAttributesGroup: getElement('div_custom_attributes_group'),
+  divDomainWrapper: getElement('div_domain_wrapper'),
   divGs1AttributesGroup: getElement('div_gs1_data_attributes_group'),
   divQualifiersGroup: getElement('div_key_qualifiers_group'),
   imgDigitalLinkVerdict: getElement('img_digital_link_verdict'),
   imgIdentifierVerdict: getElement('img_identifier_verdict'),
+  inputDomainValue: getElement('input_domain_value'),
   inputIdentifierValue: getElement('input_identifier_value'),
   inputSearchAiList: getElement('input_search_ai_list'),
-  selectQrCodeStyle: getElement('select_qr_code_style'),
   selectDomain: getElement('select_domain'),
   selectIdentifier: getElement('select_identifier'),
-  textareaDigitalLink: getElement('textarea_digital_link'),
+  selectQrCodeStyle: getElement('select_qr_code_style'),
   spanIdentifierLabel: getElement('span_identifier_label'),
   tableCustomAttributes: getElement('table_custom_attributes'),
   tableGS1Attribute: getElement('table_gs1_data_attributes'),
   tableKeyQualifier: getElement('table_key_qualifiers'),
-  inputDomainValue: getElement('input_domain_value'),
+  textareaDigitalLink: getElement('textarea_digital_link'),
 };
 
 // [{ key, value, row }]
 const customAttributes = [];
 let qrCode;
-let digitalLink;
+let digitalLink = DigitalLink();
 
 const truncate = str => (str.length < MAX_LENGTH) ? str : `${str.substring(0, MAX_LENGTH - 2)}...`;
 
@@ -66,14 +61,14 @@ const generateClassicQrCode = () => {
     qrCode = new Qrious({
       element: UI.canvasQRCode,
       size: QR_SIZE,
-      value: digitalLink,
+      value: digitalLink.toUrlString(),
       level: 'L',
       foreground: '#000000',
       background: '#FFFFFF',
     });
   }
 
-  qrCode.value = digitalLink;
+  qrCode.value = digitalLink.toUrlString();
 };
 
 const updateQrCode = () => {
@@ -86,6 +81,8 @@ const updateQrCode = () => {
 };
 
 const updateDigitalLink = () => {
+  digitalLink = DigitalLink();
+
   // Domain
   const domainKey = Object.keys(DOMAINS)
     .find(item => DOMAINS[item].value === UI.selectDomain.value);
@@ -94,43 +91,31 @@ const updateDigitalLink = () => {
   // Identifier
   const identifier = IDENTIFIER_LIST.find(item => item.code === UI.selectIdentifier.value);
   const identifierValue = UI.inputIdentifierValue.value;
-  digitalLink = `https://${domain.url}/${mapAlphaNumeric(identifier.code)}/${identifierValue}`;
+  digitalLink.setDomain(`https://${domain.url}`);
+  digitalLink.setIdentifier(mapAlphaNumeric(identifier.code), identifierValue);
 
   // Key qualifiers
   KEY_QUALIFIERS_LIST.forEach((item) => {
     const input = getElement(mapKeyQualifierInputId(item.code));
-    if (input.value) digitalLink += `/${mapAlphaNumeric(item.code)}/${input.value}`;
+    if (input.value) {
+      digitalLink.setKeyQualifier(mapAlphaNumeric(item.code), input.value);
+    }
   });
-
-  // Query params present?
-  const queryPresent = AI_LIST.some(item => getElement(mapAIInputId(item.code)).value) ||
-    customAttributes.some(item => item.key && item.value);
-  if (queryPresent) digitalLink += '?';
 
   // GS1 Data Attributes
-  const gs1Attributes = AI_LIST.filter(item => item.value);
-  const queryPairs = [];
-  gs1Attributes.forEach(item => queryPairs.push([item.code, item.value]));
+  AI_LIST.filter(item => item.value)
+    .forEach(item => digitalLink.setAttribute(item.code, item.value));
 
   // Custom Data Attributes
-  customAttributes.forEach((item) => {
-    if (!item.key || !item.value) return;
+  customAttributes
+    .filter(item => item.key && item.value)
+    .forEach(item => digitalLink.setAttribute(item.key, item.value));
 
-    queryPairs.push([item.key, item.value]);
-  });
-
-  queryPairs.forEach((item, i) => {
-    if (i !== 0) digitalLink += '&';
-
-    digitalLink += `${item[0]}=${item[1]}`;
-  });
-
-  const startRule = digitalLink.includes('id.gs1.org') ? 'canonicalGS1webURI' : 'customGS1webURI';
-  const valid = parser.validate(digitalLink, startRule);
-  UI.imgDigitalLinkVerdict.src = `./assets/${valid ? '' : 'in'}valid.svg`;
+  const isValid = digitalLink.isValid();
+  UI.imgDigitalLinkVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
 
   // Update UI
-  UI.textareaDigitalLink.innerHTML = digitalLink;
+  UI.textareaDigitalLink.innerHTML = digitalLink.toUrlString();
   updateQrCode();
 };
 
@@ -142,7 +127,7 @@ const validateKeyQualifier = ({ code, value, ruleName }) => {
   }
 
   setVisible(iconId, true);
-  getElement(iconId).src = `./assets/${parser.validate(value, ruleName) ? '' : 'in'}valid.svg`;
+  getElement(iconId).src = `./assets/${Utils.testRule(ruleName, value) ? '' : 'in'}valid.svg`;
 };
 
 const setupKeyQualifierRow = (table, item) => {
@@ -285,7 +270,7 @@ const validateIdentifier = () => {
   }
 
   setVisible(UI.imgIdentifierVerdict, true);
-  const valid = parser.validate(UI.inputIdentifierValue.value, ruleName);
+  const valid = Utils.testRule(ruleName, UI.inputIdentifierValue.value);
   UI.imgIdentifierVerdict.src = `./assets/${valid ? '' : 'in'}valid.svg`;
 };
 
@@ -350,7 +335,7 @@ const setupUI = () => {
 
   // Run Verifier button
   UI.aRunVerifier.onclick = () => {
-    window.open(`${document.location.origin}/verifier.html?url=${digitalLink}`, '_blank');
+    window.open(`${document.location.origin}/verifier.html?url=${digitalLink.toUrlString()}`, '_blank');
   };
 
   // QR Code Style
