@@ -61,14 +61,14 @@ const generateClassicQrCode = () => {
     qrCode = new Qrious({
       element: UI.canvasQRCode,
       size: QR_SIZE,
-      value: digitalLink.toUrlString(),
+      value: digitalLink.toWebUriString(),
       level: 'L',
       foreground: '#000000',
       background: '#FFFFFF',
     });
   }
 
-  qrCode.value = digitalLink.toUrlString();
+  qrCode.value = digitalLink.toWebUriString();
 };
 
 const updateQrCode = () => {
@@ -115,7 +115,7 @@ const updateDigitalLink = () => {
   UI.imgDigitalLinkVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
 
   // Update UI
-  UI.textareaDigitalLink.innerHTML = digitalLink.toUrlString();
+  UI.textareaDigitalLink.innerHTML = digitalLink.toWebUriString();
   updateQrCode();
 };
 
@@ -335,7 +335,7 @@ const setupUI = () => {
 
   // Run Verifier button
   UI.aRunVerifier.onclick = () => {
-    window.open(`${document.location.origin}/verifier.html?url=${digitalLink.toUrlString()}`, '_blank');
+    window.open(`${document.location.origin}/verifier.html?url=${digitalLink.toWebUriString()}`, '_blank');
   };
 
   // QR Code Style

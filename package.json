@@ -10,7 +10,7 @@
   "author": "EVRYTHNG",
   "dependencies": {
     "apg-lib": "^3.2.0",
-    "digital-link.js": "file:lib/digital-link.js",
+    "digital-link.js": "^1.0.0",
     "parcel-bundler": "^1.10.3",
     "qrious": "^4.0.2",
     "request": "^2.87.0"
