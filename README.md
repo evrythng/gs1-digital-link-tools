@@ -44,7 +44,7 @@ straight to the verifier tool (see below), or copy/scan the equivalent QR code.
 ![verifier](src/assets/verifier.png)
 
 The verifier tool uses the 
-[`digital-link.js`]((https://github.com/evrythng/digital-link.js)
+[`digital-link.js`](https://github.com/evrythng/digital-link.js)
 library to check a submitted GS1 Digital Link for formatting errors using the 
 grammar as detailed in `src/scripts/grammar.js`. This grammar can also be viewed 
 from the verifier page under the 'Grammar' tab. 
