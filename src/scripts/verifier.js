@@ -1,5 +1,5 @@
 const { DigitalLink, Utils } = require('digital-link.js');
-const { grammarObject } = require('./grammar');
+const { grammarObject: GrammarObject } = require('./grammar');
 const { getElement } = require('./util');
 
 const DEFAULT_QUERY = 'https://gs1.example.org/gtin/9780345418913';
@@ -17,7 +17,7 @@ const UI = {
 
 const getUrlParam = () => {
   const { search } = document.location;
-  return search.includes('url') 
+  return search.includes('url')
     ? search.substring(search.indexOf('url=') + 'url='.length)
     : false;
 };
@@ -42,7 +42,7 @@ const onVerifyClicked = () => {
 const main = () => {
   UI.inputVerifierQuery.value = getUrlParam() || DEFAULT_QUERY;
   UI.aVerify.onclick = onVerifyClicked;
-  UI.divGrammar.innerHTML = new grammarObject().toString();
+  UI.divGrammar.innerHTML = new GrammarObject().toString();
 };
 
 main();

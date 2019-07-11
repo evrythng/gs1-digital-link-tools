@@ -1,7 +1,10 @@
 const getElement = id => document.getElementById(id);
 
-const setVisible = (element, state) => {
-  if (typeof element === 'string') element = getElement(element);
+const setVisible = (el, state) => {
+  let element = el;
+  if (typeof el === 'string') {
+    element = getElement(el);
+  }
 
   element.style.display = state ? 'block' : 'none';
 };

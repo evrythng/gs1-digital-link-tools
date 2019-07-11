@@ -46,7 +46,7 @@ const customAttributes = [];
 let qrCode;
 let digitalLink = DigitalLink();
 
-const truncate = str => (str.length < MAX_LENGTH) ? str : `${str.substring(0, MAX_LENGTH - 2)}...`;
+const truncate = str => (str.length < MAX_LENGTH ? str : `${str.substring(0, MAX_LENGTH - 2)}...`);
 
 const mapAIInputId = code => `input_gs1_attribute_${code}`;
 
@@ -253,7 +253,7 @@ const updateVisibleKeyQualifiers = () => {
 
   // Show relevant key qualifiers for this identifier
   const identifier = IDENTIFIER_LIST.find(item => item.code === UI.selectIdentifier.value);
-  const visibleRows = KEY_QUALIFIERS_LIST.filter(item => identifier.keyQualifiers.includes(item.code));
+  const visibleRows = KEY_QUALIFIERS_LIST.filter(p => identifier.keyQualifiers.includes(p.code));
   visibleRows.forEach(item => setRowVisible(item.row, true));
 };
 
