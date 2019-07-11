@@ -16,6 +16,7 @@ const QR_SIZE = 180;
 const UI = {
   aQrCodeGenerate: getElement('a_qrcode_generate'),
   aRunVerifier: getElement('a_run_verifier'),
+  aCompress: getElement('a_compress'),
   canvasQRCode: getElement('canvas_qr_code'),
   checkCustomAttributes: getElement('check_custom_data_attributes'),
   checkFormatAlphanumeric: getElement('check_format_alphanumeric'),
@@ -43,8 +44,10 @@ const UI = {
 
 // [{ key, value, row }]
 const customAttributes = [];
+
 let qrCode;
 let digitalLink = DigitalLink();
+let lastOutput = '';
 
 const truncate = str => (str.length < MAX_LENGTH ? str : `${str.substring(0, MAX_LENGTH - 2)}...`);
 
@@ -61,14 +64,14 @@ const generateClassicQrCode = () => {
     qrCode = new Qrious({
       element: UI.canvasQRCode,
       size: QR_SIZE,
-      value: digitalLink.toWebUriString(),
+      value: lastOutput,
       level: 'L',
       foreground: '#000000',
       background: '#FFFFFF',
     });
   }
 
-  qrCode.value = digitalLink.toWebUriString();
+  qrCode.value = lastOutput;
 };
 
 const updateQrCode = () => {
@@ -115,7 +118,8 @@ const updateDigitalLink = () => {
   UI.imgDigitalLinkVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
 
   // Update UI
-  UI.textareaDigitalLink.innerHTML = digitalLink.toWebUriString();
+  lastOutput = digitalLink.toWebUriString();
+  UI.textareaDigitalLink.innerHTML = lastOutput;
   updateQrCode();
 };
 
@@ -333,9 +337,23 @@ const setupUI = () => {
     setVisible(UI.divCustomAttributesGroup, UI.checkCustomAttributes.checked);
   };
 
+  // Compress button
+  UI.aCompress.onclick = () => {
+    try {
+      // Compress
+      lastOutput = digitalLink.toCompressedWebUriString();
+
+      // Update
+      UI.textareaDigitalLink.innerHTML = lastOutput;
+      updateQrCode();
+    } catch (e) {
+      alert(e);
+    }
+  };
+
   // Run Verifier button
   UI.aRunVerifier.onclick = () => {
-    window.open(`${document.location.origin}/verifier.html?url=${digitalLink.toWebUriString()}`, '_blank');
+    window.open(`${document.location.origin}/verifier.html?url=${lastOutput}`, '_blank');
   };
 
   // QR Code Style
@@ -353,7 +371,7 @@ const setupUI = () => {
   setVisible(UI.aQrCodeGenerate, false);
 };
 
-(() => {
+const main = () => {
   injectTableRows();
   setupUI();
   updateDigitalLink();
@@ -362,4 +380,6 @@ const setupUI = () => {
   validateIdentifier();
 
   console.log('Script loaded!');
-})();
+};
+
+main();
