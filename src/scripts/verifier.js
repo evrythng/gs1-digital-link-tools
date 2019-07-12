@@ -21,13 +21,18 @@ const onVerifyClicked = () => {
   try {
     const inputStr = UI.inputVerifierQuery.value;
 
-    UI.divStats.innerHTML = Utils.generateStatsHtml(inputStr);
-    UI.divResults.innerHTML = Utils.generateResultsHtml(inputStr);
-    UI.divTrace.innerHTML = Utils.generateTraceHtml(inputStr).replace('display mode: ASCII', '');
+    // Decompress if required
+    const dl = DigitalLink(inputStr);
+    const finalUri = dl.toWebUriString();
 
-    const isValid = DigitalLink(inputStr).isValid();
+    UI.divStats.innerHTML = Utils.generateStatsHtml(finalUri);
+    UI.divResults.innerHTML = Utils.generateResultsHtml(finalUri);
+    UI.divTrace.innerHTML = Utils.generateTraceHtml(finalUri).replace('display mode: ASCII', '');
+
+    const isValid = dl.isValid() && dl.getValidationTrace().success;
     UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
     UI.imgVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
+    UI.inputVerifierQuery.value = finalUri;
   } catch (e) {
     console.log(e);
     UI.divResults.innerHTML = `Error: ${e.message || e}`;
