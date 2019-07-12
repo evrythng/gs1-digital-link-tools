@@ -6,7 +6,6 @@ const DEFAULT_QUERY = 'https://gs1.example.org/gtin/9780345418913';
 
 const UI = {
   aVerify: getElement('a_verify'),
-  checkIsCompressed: getElement('check_is_compressed'),
   divGrammar: getElement('div_grammar'),
   divResults: getElement('div_results'),
   divStats: getElement('div_stats'),
@@ -20,10 +19,7 @@ const getQueryParam = name => new URLSearchParams(window.location.search).get(na
 
 const onVerifyClicked = () => {
   try {
-    let inputStr = UI.inputVerifierQuery.value;
-    if (UI.checkIsCompressed.checked) {
-      inputStr = Utils.decompressWebUri(inputStr);
-    }
+    const inputStr = UI.inputVerifierQuery.value;
 
     UI.divStats.innerHTML = Utils.generateStatsHtml(inputStr);
     UI.divResults.innerHTML = Utils.generateResultsHtml(inputStr);
@@ -35,6 +31,8 @@ const onVerifyClicked = () => {
   } catch (e) {
     console.log(e);
     UI.divResults.innerHTML = `Error: ${e.message || e}`;
+    UI.imgVerdict.src = './assets/invalid.svg';
+    UI.spanVerdictResult.innerHTML = '<strong>ERROR</strong>';
   }
 };
 
@@ -42,7 +40,6 @@ const main = () => {
   UI.inputVerifierQuery.value = getQueryParam('url') || DEFAULT_QUERY;
   UI.aVerify.onclick = onVerifyClicked;
   UI.divGrammar.innerHTML = new GrammarObject().toString();
-  UI.checkIsCompressed.checked = getQueryParam('decompress') !== null;
 };
 
 main();

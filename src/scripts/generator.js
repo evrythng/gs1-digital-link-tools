@@ -48,7 +48,6 @@ const customAttributes = [];
 let qrCode;
 let digitalLink = DigitalLink();
 let lastOutput = '';
-let lastOutputCompressed = false;
 
 const truncate = str => (str.length < MAX_LENGTH ? str : `${str.substring(0, MAX_LENGTH - 2)}...`);
 
@@ -120,7 +119,6 @@ const updateDigitalLink = () => {
 
   // Update UI
   lastOutput = digitalLink.toWebUriString();
-  lastOutputCompressed = false;
   UI.textareaDigitalLink.innerHTML = lastOutput;
   updateQrCode();
 };
@@ -344,7 +342,6 @@ const setupUI = () => {
     try {
       // Compress
       lastOutput = digitalLink.toCompressedWebUriString();
-      lastOutputCompressed = true;
 
       // Update
       UI.textareaDigitalLink.innerHTML = lastOutput;
@@ -356,7 +353,7 @@ const setupUI = () => {
 
   // Run Verifier button
   UI.aRunVerifier.onclick = () => {
-    const url = `${document.location.origin}/verifier.html?url=${lastOutput}${lastOutputCompressed ? '&decompress=true' : ''}`;
+    const url = `${document.location.origin}/verifier.html?url=${lastOutput}`;
     window.open(url, '_blank');
   };
 
