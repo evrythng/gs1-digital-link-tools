@@ -337,13 +337,18 @@ const setupUI = () => {
     setVisible(UI.divCustomAttributesGroup, UI.checkCustomAttributes.checked);
   };
 
-  // Compress button
+  // Compress/decompress button
   UI.aCompress.onclick = () => {
     try {
-      // Compress
-      lastOutput = digitalLink.toCompressedWebUriString();
+      if (!Utils.isCompressedWebUri(lastOutput)) {
+        lastOutput = digitalLink.toCompressedWebUriString();
+        UI.aCompress.innerHTML = 'DECOMPRESS';
+      } else {
+        lastOutput = digitalLink.toWebUriString();
+        UI.aCompress.innerHTML = 'COMPRESS';
+      }
 
-      // Update
+      // Update UI
       UI.textareaDigitalLink.innerHTML = lastOutput;
       updateQrCode();
     } catch (e) {
