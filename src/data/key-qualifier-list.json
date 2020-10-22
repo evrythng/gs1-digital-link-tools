@@ -15,9 +15,19 @@
     "ruleName": "ser-value"
   },
   {
+    "code": "235",
+    "label": "Third Party Controlled, Serialised Extension of GTIN (TPX)",
+    "ruleName": "tpx-value"
+  },
+  {
     "code": "254",
     "label": "GLN extension component",
     "ruleName": "glnx-value"
+  },
+  {
+    "code": "7040",
+    "label": "GS1 UIC with Extension 1 and Importer index",
+    "ruleName": "uic-ext-value"
   },
   {
     "code": "8011",
@@ -28,5 +38,10 @@
     "code": "8019",
     "label": "Service Relation Instance Number (SRIN)",
     "ruleName": "srin-value"
+  },
+  {
+    "code": "8020",
+    "label": "Payment slip reference number",
+    "ruleName": "refno-value"
   }
 ]
