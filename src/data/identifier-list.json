@@ -48,10 +48,10 @@
     "ruleName": "gln-value"
   },
   {
-    "code": "415",
-    "label": "Global Location Number of the invoicing party",
+    "code": "417",
+    "label": "Party GLN",
     "keyQualifiers": [],
-    "ruleName": "payTo-value"
+    "ruleName": "partyGln-value"
   },
   {
     "code": "8003",
@@ -84,10 +84,16 @@
     "ruleName": "cpid-value"
   },
   {
+    "code": "8013",
+    "label": "Global Model Number (GMN)",
+    "keyQualifiers": [],
+    "ruleName": "gmn-value"
+  },
+  {
     "code": "8017",
     "label": "Global Service Relation Number - Provider",
     "keyQualifiers": [
-      "8017"
+      "8019"
     ],
     "ruleName": "gsrnp-value"
   },
@@ -95,8 +101,8 @@
     "code": "8018",
     "label": "Global Service Relation Number - Recipient",
     "keyQualifiers": [
-      "8017"
+      "8019"
     ],
-    "ruleName": "gsrnp-value"
+    "ruleName": "gsrn-value"
   }
 ]
