@@ -3,13 +3,8 @@
   "8006": "itip",
   "8013": "gmn",
   "8010": "cpid",
-  "410": "shipTo",
-  "411": "billTo",
-  "412": "purchasedFrom",
-  "413": "shipFor",
   "414": "gln",
-  "415": "payTo",
-  "416": "glnProd",
+  "417": "partyGln",
   "8017": "gsrnp",
   "8018": "gsrn",
   "255": "gcn",
@@ -25,5 +20,7 @@
   "8011": "cpsn",
   "254": "glnx",
   "8020": "refno",
-  "8019": "srin"
+  "8019": "srin",
+  "235": "tpx",
+  "7040": "uic-ext"
 }
