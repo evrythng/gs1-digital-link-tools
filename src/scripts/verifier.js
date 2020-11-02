@@ -52,10 +52,20 @@ const onVerifyClicked = () => {
 
     checkIfUriIsDeprecated(dl);
 
-    UI.divStats.innerHTML = Utils.generateStatsHtml(finalUri);
-    UI.divResults.innerHTML = Utils.generateResultsHtml(finalUri);
-    UI.divTrace.innerHTML = Utils.generateTraceHtml(finalUri)
-      .replace('display mode: ASCII', '');
+    // If my DL is something like this :
+    // https://example.com/my/custom/path/01/01234567890128/21/12345/10/4512
+    // I need to transform it into this :
+    // https://example.com/01/01234567890128/21/12345/10/4512
+    // Since the custom path (/my/custom/path) is not handled by the grammar file. And all
+    // the traces will be wrong.
+    const finalUriWithoutCustomPath = Utils.removeCustomPath(finalUri, dl.getDomain());
+
+    UI.divStats.innerHTML =
+      Utils.generateStatsHtml(finalUriWithoutCustomPath);
+    UI.divResults.innerHTML =
+      Utils.generateResultsHtml(finalUriWithoutCustomPath);
+    UI.divTrace.innerHTML =
+      Utils.generateTraceHtml(finalUriWithoutCustomPath).replace('display mode: ASCII', '');
 
     const isValid = dl.isValid() && dl.getValidationTrace().success;
     UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
