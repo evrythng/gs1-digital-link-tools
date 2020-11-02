@@ -82,6 +82,8 @@ const updateDigitalLink = () => {
   digitalLink = DigitalLink();
 
   // I authorize the key qualifiers to be automatically sorted following the GRAMMAR restrictions
+  // Thanks to that, the digital link object will order the key qualifiers following the GRAMMAR
+  // restrictions when you convert your digital Link into an URI string
   digitalLink.setSortKeyQualifiers(true);
 
   // Domain

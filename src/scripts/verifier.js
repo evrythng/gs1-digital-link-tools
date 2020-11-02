@@ -18,6 +18,10 @@ const UI = {
 
 const getQueryParam = name => new URLSearchParams(window.location.search).get(name);
 
+/**
+ * Check if the digital link passed in parameter contains deprecated syntax such as alphanumeric identifier for example
+ * @param dl - The Digital Link instance
+ */
 const checkIfUriIsDeprecated = (dl) => {
   Object.keys(ALPHA_MAP)
     .forEach((key) => {
@@ -31,14 +35,11 @@ const checkIfUriIsDeprecated = (dl) => {
       .forEach((key) => {
         Object.keys(dl.getKeyQualifiers())
           .forEach((keyQualifier) => {
-            console.log(keyQualifier);
             if (keyQualifier === ALPHA_MAP[key]) {
               alert(`Using ${keyQualifier} is deprecated!`);
             }
           });
       });
-  } else {
-    console.log(dl);
   }
 };
 
