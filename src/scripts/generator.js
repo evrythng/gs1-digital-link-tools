@@ -3,7 +3,6 @@ const { DigitalLink, Utils } = require('digital-link.js');
 const { getElement, setVisible, setRowVisible } = require('./util');
 
 const AI_LIST = require('../data/ai-list.json');
-const ALPHA_MAP = require('../data/alpha-map.json');
 const DOMAINS = require('../data/domains.json');
 const QR_CODE_CONFIGS = require('../data/qr-code-configs.json');
 const IDENTIFIER_LIST = require('../data/identifier-list.json');
