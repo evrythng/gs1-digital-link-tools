@@ -81,6 +81,9 @@ const updateQrCode = () => {
 const updateDigitalLink = () => {
   digitalLink = DigitalLink();
 
+  // I authorize the key qualifiers to be automatically sorted following the GRAMMAR restrictions
+  digitalLink.setSortKeyQualifiers(true);
+
   // Domain
   const domainKey = Object.keys(DOMAINS)
     .find(item => DOMAINS[item].value === UI.selectDomain.value);
