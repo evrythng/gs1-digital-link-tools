@@ -14,19 +14,25 @@ const UI = {
   imgVerdict: getElement('img_verdict'),
   inputVerifierQuery: getElement('input_verifier_query'),
   spanVerdictResult: getElement('span_verdict_result'),
+  divDeprecatedMessage: getElement('div_deprecated_message'),
 };
 
 const getQueryParam = name => new URLSearchParams(window.location.search).get(name);
 
 /**
- * Check if the digital link passed in parameter contains deprecated syntax such as alphanumeric identifier for example
+ * Check if the digital link passed in parameter contains deprecated syntax such as alphanumeric
+ * identifier for example
+ *
  * @param dl - The Digital Link instance
+ * @returns {boolean} - true if the URI is deprecated, false otherwise.
  */
 const checkIfUriIsDeprecated = (dl) => {
+  let hasDeprecatedTerms = false;
+
   Object.keys(ALPHA_MAP)
     .forEach((key) => {
       if (Object.keys(dl.getIdentifier())[0] === ALPHA_MAP[key]) {
-        alert(`Using ${Object.keys(dl.getIdentifier())[0]} is deprecated!`);
+        hasDeprecatedTerms = true;
       }
     });
 
@@ -36,11 +42,13 @@ const checkIfUriIsDeprecated = (dl) => {
         Object.keys(dl.getKeyQualifiers())
           .forEach((keyQualifier) => {
             if (keyQualifier === ALPHA_MAP[key]) {
-              alert(`Using ${keyQualifier} is deprecated!`);
+              hasDeprecatedTerms = true;
             }
           });
       });
   }
+
+  return hasDeprecatedTerms;
 };
 
 const onVerifyClicked = () => {
@@ -51,7 +59,7 @@ const onVerifyClicked = () => {
     const dl = DigitalLink(inputStr);
     const finalUri = dl.toWebUriString();
 
-    checkIfUriIsDeprecated(dl);
+    const hasDeprecatedTerms = checkIfUriIsDeprecated(dl);
 
     // If my DL is something like this :
     // https://example.com/my/custom/path/01/01234567890128/21/12345/10/4512
@@ -72,6 +80,11 @@ const onVerifyClicked = () => {
     UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
     UI.imgVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
     UI.inputVerifierQuery.value = finalUri;
+    if (hasDeprecatedTerms) {
+      UI.divDeprecatedMessage.style.visibility = 'visible';
+    } else {
+      UI.divDeprecatedMessage.style.visibility = 'hidden';
+    }
   } catch (e) {
     console.log(e);
     UI.divResults.innerHTML = `Error: ${e.message || e}`;

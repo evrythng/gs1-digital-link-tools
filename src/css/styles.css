@@ -199,6 +199,13 @@ td, th {
   font-size: 1.7rem !important;
 }
 
+.deprecated-message {
+  font-family: 'Source Sans Pro' !important;
+  color: #444 !important;
+  font-weight: 200;
+  font-size: 1rem !important;
+}
+
 .verifier-query {
   width: 550px !important;
   margin: auto;
@@ -212,6 +219,11 @@ td, th {
 .verdict-icon {
   width: 40px;
   height: 40px;
+}
+
+.deprecated-icon {
+  width: 27px;
+  height: 27px;
 }
 
 .verdict-icon-small {
