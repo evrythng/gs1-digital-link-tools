@@ -80,11 +80,7 @@ const onVerifyClicked = () => {
     UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
     UI.imgVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
     UI.inputVerifierQuery.value = finalUri;
-    if (hasDeprecatedTerms) {
-      UI.divDeprecatedMessage.style.visibility = 'visible';
-    } else {
-      UI.divDeprecatedMessage.style.visibility = 'hidden';
-    }
+    UI.divDeprecatedMessage.style.visibility = hasDeprecatedTerms ? 'visible' : 'hidden';
   } catch (e) {
     console.log(e);
     UI.divResults.innerHTML = `Error: ${e.message || e}`;
