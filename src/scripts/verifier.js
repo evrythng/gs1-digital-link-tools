@@ -3,7 +3,7 @@ const { grammarObject: GrammarObject } = require('./grammar');
 const { getElement } = require('./util');
 const ALPHA_MAP = require('../data/alpha-map.json');
 
-const DEFAULT_QUERY = 'https://gs1.example.org/gtin/9780345418913';
+const DEFAULT_QUERY = 'https://dlnkd.tn.gg/01/9780345418913';
 
 const UI = {
   aVerify: getElement('a_verify'),
