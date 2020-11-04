@@ -12,7 +12,7 @@
   "dependencies": {},
   "devDependencies": {
     "apg-lib": "^3.2.0",
-    "digital-link.js": "^1.1.0",
+    "digital-link.js": "^1.2.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.12.0",

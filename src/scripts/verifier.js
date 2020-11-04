@@ -1,8 +1,9 @@
 const { DigitalLink, Utils } = require('digital-link.js');
 const { grammarObject: GrammarObject } = require('./grammar');
 const { getElement } = require('./util');
+const ALPHA_MAP = require('../data/alpha-map.json');
 
-const DEFAULT_QUERY = 'https://gs1.example.org/gtin/9780345418913';
+const DEFAULT_QUERY = 'https://dlnkd.tn.gg/01/9780345418913';
 
 const UI = {
   aVerify: getElement('a_verify'),
@@ -13,9 +14,42 @@ const UI = {
   imgVerdict: getElement('img_verdict'),
   inputVerifierQuery: getElement('input_verifier_query'),
   spanVerdictResult: getElement('span_verdict_result'),
+  divDeprecatedMessage: getElement('div_deprecated_message'),
 };
 
 const getQueryParam = name => new URLSearchParams(window.location.search).get(name);
+
+/**
+ * Check if the digital link passed in parameter contains deprecated syntax such as alphanumeric
+ * identifier for example
+ *
+ * @param dl - The Digital Link instance
+ * @returns {boolean} - true if the URI is deprecated, false otherwise.
+ */
+const checkIfUriIsDeprecated = (dl) => {
+  let hasDeprecatedTerms = false;
+
+  Object.keys(ALPHA_MAP)
+    .forEach((key) => {
+      if (Object.keys(dl.getIdentifier())[0] === ALPHA_MAP[key]) {
+        hasDeprecatedTerms = true;
+      }
+    });
+
+  if (dl.getKeyQualifiers()) {
+    Object.keys(ALPHA_MAP)
+      .forEach((key) => {
+        Object.keys(dl.getKeyQualifiers())
+          .forEach((keyQualifier) => {
+            if (keyQualifier === ALPHA_MAP[key]) {
+              hasDeprecatedTerms = true;
+            }
+          });
+      });
+  }
+
+  return hasDeprecatedTerms;
+};
 
 const onVerifyClicked = () => {
   try {
@@ -25,14 +59,28 @@ const onVerifyClicked = () => {
     const dl = DigitalLink(inputStr);
     const finalUri = dl.toWebUriString();
 
-    UI.divStats.innerHTML = Utils.generateStatsHtml(finalUri);
-    UI.divResults.innerHTML = Utils.generateResultsHtml(finalUri);
-    UI.divTrace.innerHTML = Utils.generateTraceHtml(finalUri).replace('display mode: ASCII', '');
+    const hasDeprecatedTerms = checkIfUriIsDeprecated(dl);
+
+    // If my DL is something like this :
+    // https://example.com/my/custom/path/01/01234567890128/21/12345/10/4512
+    // I need to transform it into this :
+    // https://example.com/01/01234567890128/21/12345/10/4512
+    // Since the custom path (/my/custom/path) is not handled by the grammar file. And all
+    // the traces will be wrong.
+    const finalUriWithoutCustomPath = Utils.removeCustomPath(finalUri, dl.getDomain());
+
+    UI.divStats.innerHTML =
+      Utils.generateStatsHtml(finalUriWithoutCustomPath);
+    UI.divResults.innerHTML =
+      Utils.generateResultsHtml(finalUriWithoutCustomPath);
+    UI.divTrace.innerHTML =
+      Utils.generateTraceHtml(finalUriWithoutCustomPath).replace('display mode: ASCII', '');
 
     const isValid = dl.isValid() && dl.getValidationTrace().success;
     UI.spanVerdictResult.innerHTML = `<strong>${isValid ? 'VALID' : 'INVALID'}</strong>`;
     UI.imgVerdict.src = `./assets/${isValid ? '' : 'in'}valid.svg`;
     UI.inputVerifierQuery.value = finalUri;
+    UI.divDeprecatedMessage.style.visibility = hasDeprecatedTerms ? 'visible' : 'hidden';
   } catch (e) {
     console.log(e);
     UI.divResults.innerHTML = `Error: ${e.message || e}`;

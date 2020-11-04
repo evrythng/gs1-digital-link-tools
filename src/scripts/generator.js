@@ -3,7 +3,6 @@ const { DigitalLink, Utils } = require('digital-link.js');
 const { getElement, setVisible, setRowVisible } = require('./util');
 
 const AI_LIST = require('../data/ai-list.json');
-const ALPHA_MAP = require('../data/alpha-map.json');
 const DOMAINS = require('../data/domains.json');
 const QR_CODE_CONFIGS = require('../data/qr-code-configs.json');
 const IDENTIFIER_LIST = require('../data/identifier-list.json');
@@ -19,8 +18,6 @@ const UI = {
   aCompress: getElement('a_compress'),
   canvasQRCode: getElement('canvas_qr_code'),
   checkCustomAttributes: getElement('check_custom_data_attributes'),
-  checkFormatAlphanumeric: getElement('check_format_alphanumeric'),
-  checkFormatNumeric: getElement('check_format_numeric'),
   checkGS1Attributes: getElement('check_gs1_data_attributes'),
   checkQualifiers: getElement('check_key_qualifiers'),
   divCustomAttributesGroup: getElement('div_custom_attributes_group'),
@@ -57,8 +54,6 @@ const mapKeyQualifierInputId = code => `input_key_qualifier_${code}`;
 
 const mapKeyQualifierIconId = code => `img_key_qualifier_${code}`;
 
-const mapAlphaNumeric = code => (UI.checkFormatAlphanumeric.checked && ALPHA_MAP[`${code}`]) || code;
-
 const generateClassicQrCode = () => {
   if (!qrCode) {
     qrCode = new Qrious({
@@ -86,6 +81,11 @@ const updateQrCode = () => {
 const updateDigitalLink = () => {
   digitalLink = DigitalLink();
 
+  // I authorize the key qualifiers to be automatically sorted following the GRAMMAR restrictions
+  // Thanks to that, the digital link object will order the key qualifiers following the GRAMMAR
+  // restrictions when you convert your digital Link into an URI string
+  digitalLink.setSortKeyQualifiers(true);
+
   // Domain
   const domainKey = Object.keys(DOMAINS)
     .find(item => DOMAINS[item].value === UI.selectDomain.value);
@@ -95,13 +95,13 @@ const updateDigitalLink = () => {
   const identifier = IDENTIFIER_LIST.find(item => item.code === UI.selectIdentifier.value);
   const identifierValue = UI.inputIdentifierValue.value;
   digitalLink.setDomain(`https://${domain.url}`);
-  digitalLink.setIdentifier(mapAlphaNumeric(identifier.code), identifierValue);
+  digitalLink.setIdentifier(identifier.code, identifierValue);
 
   // Key qualifiers
   KEY_QUALIFIERS_LIST.forEach((item) => {
     const input = getElement(mapKeyQualifierInputId(item.code));
     if (input.value) {
-      digitalLink.setKeyQualifier(mapAlphaNumeric(item.code), input.value);
+      digitalLink.setKeyQualifier(item.code, input.value);
     }
   });
 
@@ -182,9 +182,9 @@ const setupAttributeRow = (table, item) => {
   item.row = newRow;
 };
 
-const searchAiList = query => query
+const searchAiList = query => (query
   ? AI_LIST.filter(n => n.label.toLowerCase().includes(query) || n.code === query)
-  : [];
+  : []);
 
 const tableHasEmptyRows = (table) => {
   for (let i = 0; i < table.rows.length; i += 1) {
@@ -211,6 +211,7 @@ const updateCustomAttributeRows = () => {
   // No rows left?
   // No empty rows?
   if (!UI.tableCustomAttributes.rows.length || !tableHasEmptyRows(UI.tableCustomAttributes)) {
+    // eslint-disable-next-line no-use-before-define
     setupCustomAttributeRow();
   }
 };
@@ -290,10 +291,6 @@ const setupUI = () => {
     DOMAINS.CUSTOM.url = UI.inputDomainValue.value;
     updateDigitalLink();
   };
-
-  // Format options
-  UI.checkFormatAlphanumeric.onchange = updateDigitalLink;
-  UI.checkFormatNumeric.onchange = updateDigitalLink;
 
   // Set identifier options
   UI.inputIdentifierValue.oninput = () => {

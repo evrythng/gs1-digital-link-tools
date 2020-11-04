@@ -13,7 +13,7 @@ verifier.
 The tool is also directly available on: https://digital-link.evrythng.com/
 
 If you would like to use Digital Links for your brand in production and at scale
-do not hesistate to [contact us](https://evrythng.com/gs1/), the EVRYTHNG
+do not hesistate to [contact us](https://evrythng.com/gs1digitallink/), the EVRYTHNG
 Platform is the first commercial platform to support the Digital Link.
 
 
